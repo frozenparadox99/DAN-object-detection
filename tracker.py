@@ -13,12 +13,7 @@ import matplotlib.pyplot as plt
 class TrackUtil:
     @staticmethod
     def convert_detection(detection):
-        '''
-        transform the current detection center to [-1, 1]
-        :param detection: detection
-        :return: translated detection
-        '''
-        # get the center, and format it in (-1, 1)
+        
         center = (2 * detection[:, 0:2] + detection[:, 2:4]) - 1.0
         center = torch.from_numpy(center.astype(float)).float()
         center.unsqueeze_(0)
@@ -30,11 +25,7 @@ class TrackUtil:
 
     @staticmethod
     def convert_image(image):
-        '''
-        transform image to the FloatTensor (1, 3,size, size)
-        :param image: same as update parameter
-        :return: the transformed image FloatTensor (i.e. 1x3x900x900)
-        '''
+       
         image = cv2.resize(image, TrackerConfig.image_size).astype(np.float32)
         image -= TrackerConfig.mean_pixel
         image = torch.FloatTensor(image)
@@ -92,14 +83,7 @@ class TrackUtil:
 
     @staticmethod
     def get_merge_similarity(t1, t2, frame_index, recorder):
-        '''
-        Get the similarity between two tracks
-        :param t1: track 1
-        :param t2: track 2
-        :param frame_index: current frame_index
-        :param recorder: recorder
-        :return: the similairty (float value). if valid, return None
-        '''
+       
         merge_value = []
         if t1 is t2:
             return None
@@ -125,12 +109,7 @@ class TrackUtil:
 
     @staticmethod
     def merge(t1, t2):
-        '''
-        merge t2 to t1, after that t2 is set invalid
-        :param t1: track 1
-        :param t2: track 2
-        :return: None
-        '''
+        
         all_f1 = [n.frame_index for n in t1.nodes]
         all_f2 = [n.frame_index for n in t2.nodes]
 
@@ -240,10 +219,7 @@ class TrackerConfig:
     def get_ua_choice():
         return (5, 0, 4, 1, 5, 5)
 class FeatureRecorder:
-    '''
-    Record features and boxes every frame
-    '''
-
+  
     def __init__(self):
         self.max_record_frame = TrackerConfig.max_record_frame
         self.all_frame_index = np.array([], dtype=int)
@@ -295,12 +271,7 @@ class FeatureRecorder:
                 self.all_similarity[frame_index][pre_index] = iou
 
     def get_feature(self, frame_index, detection_index):
-        '''
-        get the feature by the specified frame index and detection index
-        :param frame_index: start from 0
-        :param detection_index: start from 0
-        :return: the corresponding feature at frame index and detection index
-        '''
+       
 
         if frame_index in self.all_frame_index:
             features = self.all_features[frame_index]
@@ -341,13 +312,7 @@ class FeatureRecorder:
         return boxes
 
 class Node:
-    '''
-    The Node is the basic element of a track. it contains the following information:
-    1) extracted feature (it'll get removed when it isn't active
-    2) box (a box (l, t, r, b)
-    3) label (active label indicating keeping the features)
-    4) detection, the formated box
-    '''
+    
     def __init__(self, frame_index, id):
         self.frame_index = frame_index
         self.id = id
@@ -363,14 +328,7 @@ class Node:
         return recoder.all_iou[frame_index][self.frame_index][self.id, box_id]
 
 class Track:
-    '''
-    Track is the class of track. it contains all the node and manages the node. it contains the following information:
-    1) all the nodes
-    2) track id. it is unique it identify each track
-    3) track pool id. it is a number to give a new id to a new track
-    4) age. age indicates how old is the track
-    5) max_age. indicates the dead age of this track
-    '''
+   
     _id_pool = 0
 
     def __init__(self):
@@ -433,11 +391,7 @@ class Track:
         return True
 
 class Tracks:
-    '''
-    Track set. It contains all the tracks and manage the tracks. it has the following information
-    1) tracks. the set of tracks
-    2) keep the previous image and features
-    '''
+  
     def __init__(self):
         self.tracks = list() # the set of tracks
         self.max_drawing_track = TrackerConfig.max_draw_track_node
@@ -583,16 +537,7 @@ class SSTTracker:
         self.sst.eval()
 
     def update(self, image, detection, show_image, frame_index, force_init=False):
-        '''
-        Update the state of tracker, the following jobs should be done:
-        1) extract the features
-        2) stack the features together
-        3) get the similarity matrix
-        4) do assignment work
-        5) save the previous image
-        :param image: the opencv readed image, format is hxwx3
-        :param detections: detection array. numpy array (l, r, w, h) and they all formated in (0, 1)
-        '''
+       
 
         self.frame_index = frame_index
 

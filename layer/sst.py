@@ -1,9 +1,4 @@
-"""
-SST tracker net
 
-Thanks to ssd pytorch implementation (see https://github.com/amdegroot/ssd.pytorch)
-copyright: shijie Sun (shijieSun@chd.edu.cn)
-"""
 
 import torch
 import torch.nn as nn
@@ -13,14 +8,7 @@ from config.config import config
 import numpy as np
 import os
 
-#todo: add more extra columns to use the mogranic method
-#todo: label the mot17 data and train the detector.
-#todo: Does the inherient really work
-#todo: add achors to extract features
-#todo: think about how to represent the motion model
-#todo: debug every feature step and see the feature change of each objects [do]
-#todo: change the output of the SST.
-#todo: add relu to extra net
+
 
 
 class SST(nn.Module):
@@ -52,16 +40,7 @@ class SST(nn.Module):
         self.use_gpu = use_gpu
 
     def forward(self, x_pre, x_next, l_pre , l_next, valid_pre=None, valid_next=None):
-        '''
-        the sst net forward stream
-        :param x_pre:  the previous image, (1, 3, 900, 900) FT
-        :param x_next: the next image,  (1, 3, 900, 900) FT
-        :param l_pre: the previous box center, (1, 60, 1, 1, 2) FT
-        :param l_next: the next box center, (1, 60, 1, 1, 2) FT
-        :param valid_pre: the previous box mask, (1, 1, 61) BT
-        :param valid_next: the next box mask, (1, 1, 61) BT
-        :return: the similarity matrix
-        '''
+       
         sources_pre = list()
         sources_next = list()
         x_pre = self.forward_vgg(x_pre, self.vgg, sources_pre)
@@ -92,12 +71,7 @@ class SST(nn.Module):
         return x
 
     def forward_feature_extracter(self, x, l):
-        '''
-        extract features from the vgg layers and extra net
-        :param x:
-        :param l:
-        :return: the features
-        '''
+       
         s = list()
 
         x = self.forward_vgg(x, self.vgg, s)
@@ -196,11 +170,7 @@ class SST(nn.Module):
         return x
 
     def forward_selector_stacker1(self, sources, labels, selector):
-        '''
-        :param sources: [B, C, H, W]
-        :param labels: [B, N, 1, 1, 2]
-        :return: the connected feature
-        '''
+        
         sources = [
             F.relu(net(x), inplace=True) for net, x in zip(selector, sources)
         ]
@@ -335,9 +305,7 @@ def add_final(cfg, batch_normal=True):
     return layers
 
 def selector(vgg, extra_layers, batch_normal=True):
-    '''
-    batch_normal must be same to add_extras batch_normal
-    '''
+    
     selector_layers = []
     vgg_source = config['vgg_source']
 
@@ -362,10 +330,7 @@ def selector(vgg, extra_layers, batch_normal=True):
     return vgg, extra_layers, selector_layers
 
 def build_sst(phase, size=900, use_gpu=False):
-    '''
-    create the SSJ Tracker Object
-    :return: ssj tracker object
-    '''
+    
     if phase != 'test' and phase != 'train':
         print('Error: Phase not recognized')
         return
