@@ -4,6 +4,8 @@
 
 ![image](https://media.giphy.com/media/htX1vSaY4syvdT39Ys/giphy.gif)
 
+![image](tracker2.gif)
+
 ## DAN Summary
 
 - The paper mainly deals with the problem of object association in multi object tracking and utilizes the pre-existing state-of-the-art methods for object detection.
